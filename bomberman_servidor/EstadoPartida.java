@@ -1,5 +1,3 @@
-//package RMI.bomberman_servidor;
-
 public class EstadoPartida implements InterfazEstadoPartida{
     
     private boolean estadoP = false;  // false: no hay partida - true: partida en curso

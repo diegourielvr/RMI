@@ -16,7 +16,7 @@ javac -d ./bin/ Bomberman.java BombermanCliente.java InterfazEstadoPartida.java 
 Ejecutar el servicio rmiregistry desde ./bomberman_servidor/bin/ 
 
 Ejecutar el servidor 
-bomberman_servidor/bin $: java -Djava.rmi.server.codebase=file: BombermanServidor
+bomberman_servidor/bin $: java -cp ./bin/ -Djava.rmi.server.codebase=file:./bin/ BombermanServidor
 
 Ejecutar el cliente
 bomberman_cliente $: java -cp ./bin/ BombermanCliente

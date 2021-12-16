@@ -1,5 +1,3 @@
-//package RMI.bomberman_servidor;
-
 import java.io.Serializable;
 
 /* Hereda de Serializable */

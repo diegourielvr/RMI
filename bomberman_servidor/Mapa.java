@@ -1,5 +1,3 @@
-//package RMI.bomberman_servidor;
-
 public class Mapa implements InterfazMapa{
 
     private int renglones;

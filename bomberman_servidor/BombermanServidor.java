@@ -1,5 +1,3 @@
-//package RMI.bomberman_servidor;
-
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.RemoteException;

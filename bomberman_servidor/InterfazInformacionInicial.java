@@ -1,5 +1,3 @@
-//package RMI.bomberman_servidor;
-
 import java.io.Serializable;
 /**
  * Cuando pasamos un objeto Serializable como parametro de un metodo remoto,

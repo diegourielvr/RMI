@@ -1,5 +1,3 @@
-//package RMI.bomberman_servidor;
-
 public class InformacionInicial implements InterfazInformacionInicial{
     
     private Posicion posicion;

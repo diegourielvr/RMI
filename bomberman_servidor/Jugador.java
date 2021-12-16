@@ -1,5 +1,3 @@
-//package RMI.bomberman_servidor;
-
 public class Jugador implements InterfazJugador{
     int id;
     String nombre;

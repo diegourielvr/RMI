@@ -1,5 +1,3 @@
-package RMI.bomberman_cliente;
-
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 

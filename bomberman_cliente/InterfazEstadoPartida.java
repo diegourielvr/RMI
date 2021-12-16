@@ -1,6 +1,3 @@
-package RMI.bomberman_cliente;
-
-
 import java.io.Serializable;
 
 /* Hereda de Serializable */
