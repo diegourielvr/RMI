@@ -1,4 +1,4 @@
-package RMI.bomberman_servidor;
+//package RMI.bomberman_servidor;
 
 public class InformacionInicial implements InterfazInformacionInicial{
     

@@ -1,4 +1,4 @@
-package RMI.bomberman_servidor;
+//package RMI.bomberman_servidor;
 
 public class EstadoPartida implements InterfazEstadoPartida{
     
@@ -45,7 +45,7 @@ public class EstadoPartida implements InterfazEstadoPartida{
         listaJugadores[id] = new Jugador(id, nombre, pos, estado);
     }
 
-    public void actualizaPosicion(int id, int x, int y){
+    public void actualizarPosicion(int id, int x, int y){
         listaJugadores[id].posicion.x = x;
         listaJugadores[id].posicion.y = y;
     }

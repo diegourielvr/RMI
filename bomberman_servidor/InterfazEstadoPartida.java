@@ -1,4 +1,4 @@
-package RMI.bomberman_servidor;
+//package RMI.bomberman_servidor;
 
 import java.io.Serializable;
 
@@ -21,5 +21,5 @@ public interface InterfazEstadoPartida extends Serializable{
 
     public void agregaJugador(int id, String nombre, Posicion pos, int estado);
     
-    public void actualizaPosicion(int id, int x, int y);
+    public void actualizarPosicion(int id, int x, int y);
 }

@@ -1,7 +1,8 @@
-package RMI.bomberman_servidor;
+//package RMI.bomberman_servidor;
 
-import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 /**
@@ -78,9 +79,9 @@ public class BombermanServidor implements Bomberman {
             registry.bind("Bomberman", stub);
             System.err.println("BombermanServidor listo!");
         } catch (Exception e) {
-            System.err.println("BombermanServidor Eexception: " + e.toString());
+            System.err.println("BombermanServidor exception: " + e.toString());
             e.printStackTrace();
         }
-
     }
+    
 }
