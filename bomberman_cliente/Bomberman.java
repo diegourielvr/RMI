@@ -1,4 +1,4 @@
-package RMI;
+package RMI.bomberman_cliente;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
