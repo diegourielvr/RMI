@@ -5,13 +5,21 @@ import java.io.Serializable;
 /* Hereda de Serializable */
 public interface InterfazEstadoPartida extends Serializable{
     
-    /**
-     * Devuelve la posicion de los jugadores
-     */
+    public boolean getEstado();
+
+    public void partidaEnCurso();
+
+    public int getNumJugadores();
+
+    public int getJugadoresVivos();
+
+    public int generaId();
+
+    public void incrementaJugadoresVivos();
+  
     public InterfazJugador[] getListaJugadores();
 
-    /**
-     * Devuelve la posicion de las bombas
-     */
-    // public Posicion[] getListaBombas();
+    public void agregaJugador(int id, String nombre, Posicion pos, int estado);
+    
+    public void actualizaPosicion(int id, int x, int y);
 }

@@ -11,6 +11,6 @@ public interface InterfazJugador extends Serializable{
 
     public String getNombre();
 
-    public boolean getEstado();
+    public int getEstado();
 
 }
