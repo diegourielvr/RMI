@@ -56,8 +56,7 @@ public class BombermanServidor implements Bomberman {
     }
 
     public void movimiento(int id, int x, int y){
-        // implementar metodo keyListener
-        // partida.actualizarPosicion(id, x, y);
+        partida.actualizarPosicion(id, x, y);
     }
 
     public InterfazEstadoPartida obtenerEstado(){
