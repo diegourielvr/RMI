@@ -1,5 +1,6 @@
 Implementacion del juego "Bomberman" con RMI.
 
+[Compilacion]
 Generar binarios para el servidor:
 (1) Ubicarse en la carpeta ./bomberman_servidor/
 (2) Crear carpeta "bin" (cmd: mkdir bin)
@@ -11,10 +12,13 @@ Generar binarios para el cliente:
 (1) Ubicarse en la carpeta ./bomberman_cliente/
 (2) Crear carpeta "bin" (cmd: mkdir bin)
 (3) Desde la carpeta "./bomberman_cliente/" compilar con:
+
 javac -d ./bin/ Bomberman.java BombermanCliente.java InterfazEstadoPartida.java InterfazInformacionInicial.java InterfazJugador.java InterfazMapa.java InterfazJugador.java InterfazPosicion.java
 
+[Registro-de-nombres]
 Ejecutar el servicio rmiregistry desde ./bomberman_servidor/bin/ 
 
+[Ejecucion]
 Ejecutar el servidor 
 bomberman_servidor/bin $: java -cp ./bin/ -Djava.rmi.server.codebase=file:./bin/ BombermanServidor
 

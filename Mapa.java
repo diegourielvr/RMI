@@ -7,15 +7,20 @@ public class Mapa {
 
 
     Mapa() {
-        this.ren = 20;
-        this.col = 20;
-        
+        this.ren = 17;
+        this.col = 17;
+        mapa = new int[ren][col];
         for (int i = 0; i < ren; i++) {
             for (int j = 0; j < col; j++) {
-                if (i == 0 || i == ren-1 || j == 0 || j == col-1) // Bordes
+                if (i == 0 || i == ren-1 || j == 0 || j == col-1){ // Bordes
                     this.mapa[i][j] = PARED;
-                else 
+                }
+                else {
                     this.mapa[i][j] = VACIO;
+                }
+                // if (i % 2 == 0 && j % 2 == 0){
+                //     this.mapa[i][j] = PARED;
+                // }
             }
         }
     }

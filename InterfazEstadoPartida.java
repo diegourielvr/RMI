@@ -1,6 +1,7 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public interface InterfazEstadoPartida {
+public interface InterfazEstadoPartida extends Serializable{
     
     public ArrayList<Jugador> getListaJugadores();
     

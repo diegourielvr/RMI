@@ -26,7 +26,7 @@ public class BombermanServidor implements InterfazBomberman {
 
     public boolean nuevaPartida(int N){
         System.out.println("[solicitud]: Crear nueva partida.");
-        if (!estadoPartida) { // No hay partida activa
+        if (!estadoPartida && N > 0) { // Almenos un jugador (prueba)
             estadoPartida = true;
             totalJugadores = N;
             return true;
@@ -41,8 +41,8 @@ public class BombermanServidor implements InterfazBomberman {
             Jugador nuevoJugador = new Jugador(id, posIniciales.get(id).getX(),
                             posIniciales.get(id).getY(), true, nombre);
             Informacion info = new Informacion(id, nuevoJugador.getX(), 
-                            nuevoJugador.getY(), totalJugadores, mapa.getRen(),
-                            mapa.getCol(), mapa.getMapa());
+                            nuevoJugador.getY(), mapa.getRen(),
+                            mapa.getCol(), totalJugadores, mapa.getMapa());
             listaJugadores.add(nuevoJugador);
             jugadoresVivos += 1;
             return info;
@@ -55,6 +55,7 @@ public class BombermanServidor implements InterfazBomberman {
     public void movimiento(int id , int x, int y) {
         listaJugadores.get(id).setX(x);
         listaJugadores.get(id).setY(y);
+        System.out.println("mov: " + id + " (" + x + ", " + y + ")");
     }
 
     public InterfazEstadoPartida obtenerEstado() {

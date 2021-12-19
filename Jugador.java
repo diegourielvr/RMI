@@ -1,4 +1,5 @@
-public class Jugador {
+
+public class Jugador implements InterfazJugador{
     private int id;
     private int pos_x;
     private int pos_y;
