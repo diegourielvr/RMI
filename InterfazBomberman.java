@@ -2,20 +2,10 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 /**
- * Un objeto remoto es una instancia de una clase 
- * que implementa una interfaz remota.
- * 
- * En nuestro caso, definimos la interfaz remota bomberman,
- * que debe extender de java.rmi.Remote
- * y declaramos un conjunto de metodos remotos.
- * 
- * Cada método remoto debe declerar 
- * java.rmi.RemoteException en su cláusula throw.
+ * Métodos remotos
  */
+public interface InterfazBomberman extends Remote {
 
-/* Hereda de Remote */
-public interface Bomberman extends Remote{
-    
     /** 
      * Iniciar una partida para N jugadores. 
      * Regresa true si la partida fue creada correctamente de lo contrario regresa false. 
@@ -26,12 +16,11 @@ public interface Bomberman extends Remote{
      * Registrar nombre como nuevo jugador en una partida.
      * Regresa la posicion de inicio, id del jugador y la información del mundo
      */
-    public InterfazInformacionInicial nuevoJugador(String nombre) throws RemoteException;
+    public InterfazInformacion nuevoJugador(String nombre) throws RemoteException;
 
     /**
      * Preguntar repetidamente si estan los N jugadores.
-     * Regresa verdadero o falso dependiendo si se cumplen los N jugadores.
-     * (opcion permitida) Regresa el numero de jugadores que se encuentran en la partida 
+     * Regresa el numero de jugadores que se encuentran en la partida 
      */
     public int partidaLista() throws RemoteException;
 
@@ -49,4 +38,5 @@ public interface Bomberman extends Remote{
     // public void ponerBomba(int x, int y) throws RemoteException;
 
     // public void eliminacion(int id) throws RemoteException;
+
 }
