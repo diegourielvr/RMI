@@ -18,9 +18,9 @@ public class Mapa {
                 else {
                     this.mapa[i][j] = VACIO;
                 }
-                // if (i % 2 == 0 && j % 2 == 0){
-                //     this.mapa[i][j] = PARED;
-                // }
+                if (i % 2 == 0 && j % 2 == 0){
+                    this.mapa[i][j] = PARED;
+                }
             }
         }
     }

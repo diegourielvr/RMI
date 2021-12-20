@@ -49,13 +49,13 @@ public class BombermanCliente {
                 stub.nuevaPartida(N);
             }
             
-            System.out.println("Ingresa la frecuencia de actualizacion (máximo: 144):");
+            System.out.println("Ingresa la frecuencia de actualizacion (Recomendado: >40):");
             System.out.flush();
             int frecuencia = sc.nextInt();
 
             System.out.print("Ingresa tu apodo:");
             System.out.flush();
-            nombre = sc.nextLine();
+            nombre = sc.next();
 
             InterfazInformacion info = stub.nuevoJugador(nombre);
             if (info == null ){
@@ -110,6 +110,9 @@ public class BombermanCliente {
                             nuevoMapa[jugador.getX()][jugador.getY()] = JUGADOR_EXTERNO;
                         }
                     }
+
+                    mJ.setMapa(nuevoMapa);
+                    
                     for (int i = 0; i < ren; i++) {
                         for (int j = 0; j < col; j++) {
                             if (nuevoMapa[i][j] == PARED)

@@ -55,7 +55,7 @@ public class BombermanServidor implements InterfazBomberman {
     public void movimiento(int id , int x, int y) {
         listaJugadores.get(id).setX(x);
         listaJugadores.get(id).setY(y);
-        System.out.println("mov: " + id + " (" + x + ", " + y + ")");
+        System.out.println("jugador: " + id + " mov: (" + x + ", " + y + ")");
     }
 
     public InterfazEstadoPartida obtenerEstado() {
