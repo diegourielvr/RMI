@@ -1,22 +1,18 @@
-Implementacion del juego "Bomberman" con RMI.
+# Implementacion del juego **Bomberman** con RMI
+-----
+## Generar binarios para el servidor:
+* Crear carpeta **bin/** dentro de la carpeta **RMI/** 
+    * RMI$: ```mkdir bin```
+* Desde la carpeta **RMI/** compilar con:
+    ```
+    javac -d ./bin/ Informacion.java Jugador.java BombermanCliente.java InterfazBomberman.java Mapa.java BombermanServidor.java InterfazEstadoPartida.java Posicion.java EstadoPartida.java InterfazInformacion.java MovimientoJugador.java
+    ```
+## Ejecutar servicio *+rmiregistry**
+* RMI/bin$: rmiregistry
 
-Generar binarios para el servidor:
-(1) Ubicarse en la carpeta ./bomberman_servidor/
-(2) Crear carpeta "bin" (cmd: mkdir bin)
-(3) Desde la carpeta "./bomberman_servidor/" compilar con:
+## Ejecutar servidor 
+* RMI/bin$: ```java -cp ./bin/ -Djava.rmi.server.codebase=file:./bin/ BombermanServidor```
 
-javac -d ./bin/ Bomberman.java BombermanServidor.java EstadoPartida.java InformacionInicial.java InterfazEstadoPartida.java InterfazInformacionInicial.java InterfazJugador.java InterfazMapa.java InterfazPosicion.java Jugador.java Mapa.java Posicion.java
+## Ejecutar cliente
+* RMI/bin$: ```java -cp ./bin/ BombermanCliente```
 
-Generar binarios para el cliente:
-(1) Ubicarse en la carpeta ./bomberman_cliente/
-(2) Crear carpeta "bin" (cmd: mkdir bin)
-(3) Desde la carpeta "./bomberman_cliente/" compilar con:
-javac -d ./bin/ Bomberman.java BombermanCliente.java InterfazEstadoPartida.java InterfazInformacionInicial.java InterfazJugador.java InterfazMapa.java InterfazJugador.java InterfazPosicion.java
-
-Ejecutar el servicio rmiregistry desde ./bomberman_servidor/bin/ 
-
-Ejecutar el servidor 
-bomberman_servidor/bin $: java -cp ./bin/ -Djava.rmi.server.codebase=file:./bin/ BombermanServidor
-
-Ejecutar el cliente
-bomberman_cliente $: java -cp ./bin/ BombermanCliente

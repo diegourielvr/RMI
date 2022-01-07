@@ -63,6 +63,7 @@ public class MovimientoJugador implements KeyListener {
     }
     @Override
     public void keyReleased (KeyEvent e){}
+
     @Override
     public void keyTyped(KeyEvent e){}
 }

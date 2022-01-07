@@ -1,4 +1,2 @@
 # Ignora todos los archivos binarios
-bomberman_servidor/bin/
-
-bomberman_cliente/bin/
+bin/*.class

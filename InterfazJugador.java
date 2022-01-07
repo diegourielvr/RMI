@@ -1,3 +1,4 @@
+// NO SE USA ESTA INTERFAZ
 import java.io.Serializable;
 
 public interface InterfazJugador extends Serializable{
