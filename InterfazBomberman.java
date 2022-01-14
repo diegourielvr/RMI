@@ -35,8 +35,19 @@ public interface InterfazBomberman extends Remote {
      */
     public InterfazEstadoPartida obtenerEstado() throws RemoteException;
     
-    // public void ponerBomba(int x, int y) throws RemoteException;
+    /**
+     * Coloca una bomba en la posicion actual del jugador
+     */
+    public void ponerBomba(int idPropietario, int x, int y) throws RemoteException;
 
-    // public void eliminacion(int id) throws RemoteException;
+    /**
+     * Elimina la bomba de la lista con el id especificado 
+     */
+    public void quitarBomba(int idBomba) throws RemoteException;
+
+    /**
+     * Elimina al jugador con el id especificado
+     */
+    public void eliminacion(int id) throws RemoteException;
 
 }

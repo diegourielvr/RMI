@@ -3,7 +3,7 @@ import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class BombermanCliente {
+public class BombermanClienteCopy {
     private static int id;
     private static int x;
     private static int y;
@@ -23,17 +23,7 @@ public class BombermanCliente {
     private static int JUGADOR_EXTERNO = 2;
     private static int BOMBA = 3;
 
-    public BombermanCliente() {
-        // id = 0;
-        // nombre = "";
-        // x = 0;
-        // y = 0;
-        // N = 0;
-        // ren = 0;
-        // col = 0;
-        // jugadoresVivos = 0;
-        // stub = null;
-        // listaJugadores = new ArrayList<Jugador>();;
+    public BombermanClienteCopy() {
     }
 
     private static void actualizarMapa(int nuevoMapa[][]){
@@ -137,6 +127,7 @@ public class BombermanCliente {
             int fps = 1000 / frecuencia;
             
             int[][] nuevoMapa = new int[ren][col];
+            
             while (!finPartida) {
                 // Obtener estado cada tiempo
                 try {
@@ -149,59 +140,20 @@ public class BombermanCliente {
                     listaBombas = nuevoEstado.getListaBombas();
 
                     actualizarMapa(nuevoMapa);
-                    // for (int i = 0; i < ren; i++){
-                    //     for (int j = 0; j < col; j++) {
-                    //         nuevoMapa[i][j] = mapa[i][j];
-                    //     }
-                    // }
                     
-                    // for (Jugador jugador : listaJugadores) {
-                    //     if  (jugador.getId() == id){
-                    //         nuevoMapa[jugador.getX()][jugador.getY()] = JUGADOR;
-                    //     } else {
-                    //         nuevoMapa[jugador.getX()][jugador.getY()] = JUGADOR_EXTERNO;
-                    //     }
-                    // }
-
-                    // for (Bomba bomba : listaBombas) {
-                    //     // La bomba aun no explota
-                    //     if (bomba.getEstadoBomba() == false) {
-                    //         mapa[bomba.getX()][bomba.getY()] = BOMBA;
-                    //     }
-                    // }
                     mJ.setMapa(nuevoMapa);// Notificar de las nuevas entidades
 
                     dibujarMapa(nuevoMapa);
-                    // for (int i = 0; i < ren; i++) {
-                    //     for (int j = 0; j < col; j++) {
-                    //         if (nuevoMapa[i][j] == PARED)
-                    //             System.out.print("🌀");
-                    //         if (nuevoMapa[i][j] == VACIO)
-                    //             System.out.print("  ");
-                    //             // System.out.print("🔲");
-                    //         if (nuevoMapa[i][j] == JUGADOR)
-                    //             System.out.print("🥶");
-                    //         if (nuevoMapa[i][j] == JUGADOR_EXTERNO)
-                    //             System.out.print("🥵");
-                    //         if (nuevoMapa[i][j] == BOMBA)
-                    //             System.out.print("💣");
-                    //         System.out.flush();
-                    //     }
-                    //     System.out.println("");
-                    //     System.out.flush();
-                    // }
+
                     Thread.sleep(fps);
 
                     limpiarPantalla();
-                    // System.out.print("\033[H\033[2J"); // Limpiar pantalla
-                    // System.out.flush();
 
                 } catch (Exception e) {
                     System.err.println("[Exception del cliente]: " + e.toString());
                     e.printStackTrace();
                     System.exit(0);
                 }
-
             }
         } catch (Exception e) {
             System.err.println("Excepcion del Cliente: " + e.toString());

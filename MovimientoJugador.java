@@ -2,6 +2,7 @@ import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.rmi.RemoteException;
+import java.util.concurrent.ConcurrentHashMap.KeySetView;
 public class MovimientoJugador implements KeyListener {
     private int x;
     private int y;
@@ -13,7 +14,7 @@ public class MovimientoJugador implements KeyListener {
     private static int PARED = -1;
     
     MovimientoJugador (int id, int x, int y, int ren, int col, InterfazBomberman stub){
-        this.id = id;
+        this.id = id;//id de jugador
         this.x = x;
         this.y = y;
         this.ren = ren;
@@ -41,7 +42,6 @@ public class MovimientoJugador implements KeyListener {
         if (e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D) {
             if (y != col-2 && mapa[x][y+1] != PARED)
                 y += 1;
-            
         }
     
         if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_S) {
@@ -55,7 +55,15 @@ public class MovimientoJugador implements KeyListener {
                 y -= 1;
         }
 
-         try {
+        if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+            try {
+                stub.ponerBomba(id, x, y);   
+            } catch (RemoteException e1) {
+                e1.printStackTrace();
+            }
+        }
+        
+        try {
             stub.movimiento(id, x, y);
         } catch (RemoteException e1) {
             e1.printStackTrace();

@@ -5,5 +5,5 @@ public interface InterfazEstadoPartida extends Serializable{
     
     public ArrayList<Jugador> getListaJugadores();
     
-    // public ArrayList<Bomba> getListaBombas();
+    public ArrayList<Bomba> getListaBombas();
 }

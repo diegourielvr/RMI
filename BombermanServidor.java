@@ -9,7 +9,9 @@ public class BombermanServidor implements InterfazBomberman {
     private int jugadoresVivos;
     private boolean estadoPartida;
     private ArrayList<Jugador> listaJugadores;
+    private ArrayList<Bomba> listaBombas;
     private ArrayList<Posicion> posIniciales;
+    private int contIdBombas; // id de una nueva bomba
     
     BombermanServidor() {
         mapa = new Mapa();
@@ -22,6 +24,7 @@ public class BombermanServidor implements InterfazBomberman {
         posIniciales.add(new Posicion (1, mapa.getCol() - 2));
         posIniciales.add(new Posicion (mapa.getRen() - 2, 1));
         posIniciales.add(new Posicion (mapa.getRen() - 2, mapa.getCol() - 2));
+        contIdBombas = 0;
     }
 
     public boolean nuevaPartida(int N){
@@ -59,15 +62,43 @@ public class BombermanServidor implements InterfazBomberman {
     }
 
     public InterfazEstadoPartida obtenerEstado() {
-        EstadoPartida nuevoEstado = new EstadoPartida(listaJugadores);
+        EstadoPartida nuevoEstado = new EstadoPartida(listaJugadores, listaBombas);
         return nuevoEstado; 
+    }
+
+    public void ponerBomba(int idPropietario, int x, int y) {
+        int idBomba = contIdBombas;
+        contIdBombas += 1;
+        listaBombas.add(new Bomba(idBomba, x, y, idPropietario));
+    }
+
+    public void quitarBomba(int idBomba){
+        for (Bomba bomba : listaBombas) {
+            if (bomba.getIdBomba() == idBomba){
+                listaBombas.remove(bomba);
+                return;
+            }
+            // Si la función es exitosa se puede implementar en eliminacion() v
+        }
+    }
+
+    public void eliminacion(int id){
+        for (int i = 0; i < listaJugadores.size(); i++) {
+            Jugador jugador = listaJugadores.get(i);
+            if (jugador.getId() == id) {
+                listaJugadores.remove(i);
+                return;
+            }
+        }
     }
 
     public void reiniciarPartida() {
         this.estadoPartida = false;
         this.totalJugadores = 0;
         this.jugadoresVivos = 0;
+        this.contIdBombas =0 ;
         this.listaJugadores.clear();
+        this.listaBombas.clear();
     }
 
     public static void main(String[] args) {
