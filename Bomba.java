@@ -1,10 +1,11 @@
 public class Bomba implements InterfazBomba{
-    int idBomba;
-    int x;
-    int y;
-    int idPropietario;// El propietario debe eliminar la bomba
-    boolean estadoBomba;//False: Sin explotar - True: Explotada
-
+    private int idBomba;
+    private int x;
+    private int y;
+    private int idPropietario;// El propietario debe eliminar la bomba
+    private boolean estadoBomba;//False: Sin explotar - True: Explotada
+    private int ticksParaExplotar;
+    private int tickActual;
     Bomba() {
 
     }
@@ -14,7 +15,9 @@ public class Bomba implements InterfazBomba{
         this.x = x;
         this.y = y;
         this.idPropietario = idPropietario;// El propietario debe eliminar la bomba
-        this.estadoBomba = false;
+        this.estadoBomba = false;//aun si explotar
+        this.ticksParaExplotar = 0;
+        this.tickActual = 0;
     }
 
     public int getIdBomba() {
@@ -25,6 +28,22 @@ public class Bomba implements InterfazBomba{
         return x;
     }
 
+    public int getTicksParaExplotar(){
+        return this.ticksParaExplotar;
+    }
+
+    public void setTicksParaExplotar(int t){
+        this.ticksParaExplotar = t;
+    }
+
+    public int getTickActual(){
+        return this.tickActual;
+    }
+    
+    public void setTickActual(int t){
+        this.tickActual = t;
+    }
+
     public int getY() {
         return y;
     }
@@ -32,7 +51,12 @@ public class Bomba implements InterfazBomba{
     public int getIdPropietario() {
         return idPropietario;
     }
+
     public boolean getEstadoBomba(){
-        return estadoBomba;
+        return estadoBomba;// regresa false si aun no explota la bomba
+    }
+
+    public void setEstadoBomba(boolean estado){
+        this.estadoBomba = estado;
     }
 }

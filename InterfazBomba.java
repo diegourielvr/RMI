@@ -11,4 +11,8 @@ public interface InterfazBomba extends Serializable{
     public int getIdPropietario();
     
     public boolean getEstadoBomba();
+
+    public int getTicksParaExplotar();
+
+    public int getTickActual();
 }

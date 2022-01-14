@@ -1,213 +1,196 @@
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class BombermanCliente {
-    private static int id;
-    private static int x;
-    private static int y;
-    private static int N;
-    private static int ren;
-    private static int col;
-    private static String nombre;
-    private static int [][] mapa;
-    private static InterfazBomberman stub;
-    private static int jugadoresVivos;
-    private static ArrayList<Jugador> listaJugadores;
-    private static ArrayList<Bomba> listaBombas;
-
-    private static int VACIO = 0;
-    private static int PARED = -1;
-    private static int JUGADOR = 1;
-    private static int JUGADOR_EXTERNO = 2;
-    private static int BOMBA = 3;
+    private int N; 
+    private int fps;
+    private Mapa mapa;
+    private Mapa mapaObjetos; // Mapa con objetos
+    private Jugador jugador;
+    private int jugadoresVivos;
+    private MovimientoJugador m;
+    private InterfazBomberman stub;
+    private ArrayList<Bomba> listaBombas;
+    private ArrayList<Jugador> listaJugadores;
 
     public BombermanCliente() {
-        // id = 0;
-        // nombre = "";
-        // x = 0;
-        // y = 0;
-        // N = 0;
-        // ren = 0;
-        // col = 0;
-        // jugadoresVivos = 0;
-        // stub = null;
-        // listaJugadores = new ArrayList<Jugador>();;
+        this.N = 0;
+        this.m = null;
+        this.mapa = new Mapa();
+        this.mapaObjetos = new Mapa();
+        this.jugador = new Jugador();
+        this.jugadoresVivos = 0;
+        this.stub = null;
+        this.listaJugadores = new ArrayList<Jugador>();;
+        this.listaBombas = new ArrayList<Bomba>();;
     }
 
-    private static void actualizarMapa(int nuevoMapa[][]){
-        for (int i = 0; i < ren; i++){
-            for (int j = 0; j < col; j++) {
-                nuevoMapa[i][j] = mapa[i][j];
+    public void asociarStub(InterfazBomberman Stub){
+        this.stub = Stub;
+    }
+
+    public boolean buscarPartida(int N){
+        boolean estadoPartida = false;
+        try {
+            estadoPartida = stub.nuevaPartida(N);
+        } catch (Exception e) {
+            System.err.println("Error del cliente");
+            e.printStackTrace();
+        }
+        return estadoPartida;
+    }
+
+    public void setFrecuencia(int frecuencia){
+        this.fps = (int) (1000 / frecuencia);
+        System.out.println("fps: "+ fps);
+    }
+
+    public boolean unirsePartida(String nombre){
+        InterfazInformacion info = null;
+        try {
+            info = stub.nuevoJugador(nombre);
+        } catch (Exception e) {
+            System.err.println("Error del cliente: nuevoJugador");
+            e.printStackTrace();
+        }
+        if (info != null){
+            this.jugador.setNombre(nombre);
+            this.jugador.setId(info.getId());
+            this.jugador.setX(info.getPosX());//pos inicial x
+            this.jugador.setY(info.getPosY());//pos inicial y
+            this.jugador.setEstado(true);// Jugador vivo
+            this.mapa.setRen(info.getRen());
+            this.mapa.setCol(info.getCol());
+            this.mapa.setMapa(info.getMapa());
+            this.N = info.getN();// Numero de jugadores
+            this.mapaObjetos.setRen(info.getRen());
+            this.mapaObjetos.setCol(info.getCol());
+            return true;
+        } 
+        else return false;
+    }
+
+    public void esperarJugadores(){
+        int auxJugadoresVivos = 0;
+        while (jugadoresVivos < N){
+            //posible error: agregar try-catch
+            try {
+                jugadoresVivos = stub.partidaLista();    
+            } catch (Exception e) {
+                System.err.println("Error del cliente: partidaLista");
+                e.printStackTrace();
+            }
+            if (auxJugadoresVivos != jugadoresVivos) {
+                System.out.println("\t" + jugadoresVivos + "/" + N + "  jugadores");   
+                auxJugadoresVivos = jugadoresVivos;
+            }
+        }
+    }
+
+    public void asignarControles(){
+        m = new MovimientoJugador(this.jugador.getId(),
+            this.jugador.getX(), this.jugador.getY(), this.mapa.getRen(), 
+            this.mapa.getCol(), this.stub);
+
+        m.escucha();
+    }
+
+    public void actualizarObjetos(){
+        //posible error: agregar try-catch
+        InterfazEstadoPartida nuevoEstado = null;
+        try {    
+            nuevoEstado = stub.obtenerEstado();
+        } catch (Exception e) {
+            System.err.println("Error del cliente: obtenerEstado");
+            e.printStackTrace();
+        }
+
+        this.listaJugadores = nuevoEstado.getListaJugadores();
+        ArrayList<Bomba> nuevaListaBombas = nuevoEstado.getListaBombas();
+
+        boolean agregarBomba = true;
+        for (Bomba b : nuevaListaBombas) {
+            agregarBomba = true;
+            for (Bomba lb : listaBombas) {
+                if (b.getIdBomba() == lb.getIdBomba()){
+                    agregarBomba = false;
+                }
+            }
+            if (agregarBomba){
+                Bomba nb = new Bomba(b.getIdBomba(), b.getX(), b.getY(), b.getIdPropietario());
+                // nb.setTicksParaExplotar(fps * 3);//3 seg para explotar
+                nb.setTicksParaExplotar((1000 / fps) * 3);//3 seg para explotar
+                // nb.setTicksParaExplotar(300);//3 seg para explotar
+                listaBombas.add(nb);
+            }
+        }
+    }
+
+    public void actualizarMapa(){
+        /**
+         * Aqui se puede actualizar el timer de las bombas (cada : fps * 3 ticks)
+         */
+        // ifor (Bomba b : this.listaBombas) {
+        for (int i = 0; i < listaBombas.size(); i++) {
+            Bomba b = listaBombas.get(i);
+            // System.out.println("aqui");
+            b.setTickActual(b.getTickActual() + 1);
+            // System.out.println("my tick: " + b.getTickActual());
+            // System.out.println("my tick to ex: " + b.getTicksParaExplotar());
+            if (b.getTickActual() >= b.getTicksParaExplotar()){
+                // b.setEstadoBomba(true);
+                /**
+                 * VAlidar radio de la explosion y si el jugador murió
+                 */
+                //m.validarRadio(b.getX(),b.getY());
+                if (b.getIdPropietario() == this.jugador.getId()){
+                    try {
+                        stub.quitarBomba(b.getIdBomba());//quitar bomba del servidor       
+                    } catch (Exception e) {
+                        System.err.println("Error del cliente: quitarBomba");
+                        e.printStackTrace();
+                    }
+                }
+                // listaBombas.remove(ib);
+                listaBombas.remove(b);
             }
         }
         
-        for (Jugador jugador : listaJugadores) {
-            if  (jugador.getId() == id){
-                nuevoMapa[jugador.getX()][jugador.getY()] = JUGADOR;
+        
+        //recuperar mapa original
+        mapaObjetos.setMapa(mapa.getMapa());
+        // Agregar objetos al mapa
+        for (Jugador j : listaJugadores) {
+            if (j.getId() == this.jugador.getId()){
+                mapaObjetos.asignaObjeto(j.getX(), j.getY(), mapaObjetos.JUGADOR);
             } else {
-                nuevoMapa[jugador.getX()][jugador.getY()] = JUGADOR_EXTERNO;
+                mapaObjetos.asignaObjeto(j.getX(), j.getY(), mapaObjetos.JUGADOR_EXTERNO);
             }
         }
+        
+        for (Bomba b  : listaBombas) {
+            mapaObjetos.asignaObjeto(b.getX(), b.getY(), mapaObjetos.BOMBA);
+        }
 
-        for (Bomba bomba : listaBombas) {
-            // La bomba aun no explota
-            if (bomba.getEstadoBomba() == false) {
-                mapa[bomba.getX()][bomba.getY()] = BOMBA;
-            }
-        }       
-    }
-    private static void dibujarMapa(int nuevoMapa[][]){
-        for (int i = 0; i < ren; i++) {
-            for (int j = 0; j < col; j++) {
-                if (nuevoMapa[i][j] == PARED)
-                    System.out.print("🌀");
-                if (nuevoMapa[i][j] == VACIO)
-                    System.out.print("  ");//🔲
-                if (nuevoMapa[i][j] == JUGADOR)
-                    System.out.print("🥶");
-                if (nuevoMapa[i][j] == JUGADOR_EXTERNO)
-                    System.out.print("🥵");
-                if (nuevoMapa[i][j] == BOMBA)
-                    System.out.print("💣");
-                    // System.out.flush();
-            }
-            System.out.println("");
-        }               
-    }
-
-    private static void limpiarPantalla(){
-        System.out.print("\033[H\033[2J");
-        // System.out.flush();
-    }
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        String host = (args.length < 1) ? null : args[0];
-        System.out.println("\t\t- BOMBERMAN GAME -");
 
         try {
-            Registry registry = LocateRegistry.getRegistry(host);// null indica por defecto 'localhost'
-            stub = (InterfazBomberman) registry.lookup("Bomberman");// Localizar servicio
-            
-            if (!stub.nuevaPartida(0)) { // No hay partida activa
-                System.out.println("Ingresa el número de jugadores (Entre 2 y 4):");
-                N = sc.nextInt();
-                stub.nuevaPartida(N);
-            }
-            
-            System.out.println("Ingresa la frecuencia de actualizacion (Recomendado: >40):");
-            // System.out.flush();
-            int frecuencia = sc.nextInt();
-
-            System.out.print("Ingresa tu apodo:");
-            // System.out.flush();
-            nombre = sc.next();
-
-            InterfazInformacion info = stub.nuevoJugador(nombre);
-            if (info == null ){
-                System.out.println("La partida se encuentra llena");
-                System.out.println("Intenta más tarde!");
-                System.exit(0);
-            }
-            System.out.println("Uniendose a una partida...");
-            
-            id = info.getId();
-            N = info.getN();
-            x = info.getPosX();
-            y = info.getPosY();
-            ren = info.getRen();
-            col = info.getCol();
-            mapa = info.getMapa();
-
-            int auxJugadoresVivos = 0;
-            
-            while (jugadoresVivos < N) {
-                jugadoresVivos = stub.partidaLista();
-                if (auxJugadoresVivos != jugadoresVivos){
-                    System.out.println("\t" + jugadoresVivos + "/" + N + "  jugadores");
-                    auxJugadoresVivos = jugadoresVivos;
-                }
-            }
-
-            MovimientoJugador mJ = new MovimientoJugador(id, x, y, ren, col, stub);
-            mJ.escucha();
-
-            boolean finPartida = false;
-            int fps = 1000 / frecuencia;
-            
-            int[][] nuevoMapa = new int[ren][col];
-            while (!finPartida) {
-                // Obtener estado cada tiempo
-                try {
-                    InterfazEstadoPartida nuevoEstado = stub.obtenerEstado();
-                    listaJugadores = nuevoEstado.getListaJugadores();
-
-                    /**
-                     * Si hay nuevas bombas entonces creamos un hilo para esa bomba
-                     */
-                    listaBombas = nuevoEstado.getListaBombas();
-
-                    actualizarMapa(nuevoMapa);
-                    // for (int i = 0; i < ren; i++){
-                    //     for (int j = 0; j < col; j++) {
-                    //         nuevoMapa[i][j] = mapa[i][j];
-                    //     }
-                    // }
-                    
-                    // for (Jugador jugador : listaJugadores) {
-                    //     if  (jugador.getId() == id){
-                    //         nuevoMapa[jugador.getX()][jugador.getY()] = JUGADOR;
-                    //     } else {
-                    //         nuevoMapa[jugador.getX()][jugador.getY()] = JUGADOR_EXTERNO;
-                    //     }
-                    // }
-
-                    // for (Bomba bomba : listaBombas) {
-                    //     // La bomba aun no explota
-                    //     if (bomba.getEstadoBomba() == false) {
-                    //         mapa[bomba.getX()][bomba.getY()] = BOMBA;
-                    //     }
-                    // }
-                    mJ.setMapa(nuevoMapa);// Notificar de las nuevas entidades
-
-                    dibujarMapa(nuevoMapa);
-                    // for (int i = 0; i < ren; i++) {
-                    //     for (int j = 0; j < col; j++) {
-                    //         if (nuevoMapa[i][j] == PARED)
-                    //             System.out.print("🌀");
-                    //         if (nuevoMapa[i][j] == VACIO)
-                    //             System.out.print("  ");
-                    //             // System.out.print("🔲");
-                    //         if (nuevoMapa[i][j] == JUGADOR)
-                    //             System.out.print("🥶");
-                    //         if (nuevoMapa[i][j] == JUGADOR_EXTERNO)
-                    //             System.out.print("🥵");
-                    //         if (nuevoMapa[i][j] == BOMBA)
-                    //             System.out.print("💣");
-                    //         System.out.flush();
-                    //     }
-                    //     System.out.println("");
-                    //     System.out.flush();
-                    // }
-                    Thread.sleep(fps);
-
-                    limpiarPantalla();
-                    // System.out.print("\033[H\033[2J"); // Limpiar pantalla
-                    // System.out.flush();
-
-                } catch (Exception e) {
-                    System.err.println("[Exception del cliente]: " + e.toString());
-                    e.printStackTrace();
-                    System.exit(0);
-                }
-
-            }
+            Thread.sleep((long) fps);
         } catch (Exception e) {
-            System.err.println("Excepcion del Cliente: " + e.toString());
+            System.out.println("Excepcion del cliente: fps");
             e.printStackTrace();
         }
-        sc.close();
+
+        m.setMapa(mapaObjetos.getMapa());
+    }
+
+    public void dibujarMapa(){
+        mapaObjetos.mostrarMapa();            
+    }
+
+    public void limpiarPantalla(){
+        System.out.print("\033[H\033[2J"); // Limpiar pantalla
+        // System.out.flush();
     }
 
 }

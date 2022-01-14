@@ -7,7 +7,7 @@ public class BombermanServidor implements InterfazBomberman {
     private Mapa mapa;
     private int totalJugadores;
     private int jugadoresVivos;
-    private boolean estadoPartida;
+    private boolean partidaActiva;
     private ArrayList<Jugador> listaJugadores;
     private ArrayList<Bomba> listaBombas;
     private ArrayList<Posicion> posIniciales;
@@ -17,8 +17,9 @@ public class BombermanServidor implements InterfazBomberman {
         mapa = new Mapa();
         totalJugadores = 0;
         jugadoresVivos = 0;
-        estadoPartida = false;
+        partidaActiva = false;
         listaJugadores = new ArrayList<Jugador>();
+        listaBombas = new ArrayList<Bomba>();
         posIniciales = new ArrayList<Posicion>();
         posIniciales.add(new Posicion (1, 1));
         posIniciales.add(new Posicion (1, mapa.getCol() - 2));
@@ -29,8 +30,8 @@ public class BombermanServidor implements InterfazBomberman {
 
     public boolean nuevaPartida(int N){
         System.out.println("[solicitud]: Crear nueva partida.");
-        if (!estadoPartida && N > 0) { // Almenos un jugador (prueba)
-            estadoPartida = true;
+        if (!partidaActiva && N > 0) { // Almenos un jugador (prueba)
+            partidaActiva = true;
             totalJugadores = N;
             return true;
         } 
@@ -53,7 +54,9 @@ public class BombermanServidor implements InterfazBomberman {
         else return null; // partida llena
     }
 
-    public int partidaLista() { return jugadoresVivos; }
+    public int partidaLista() { 
+        return jugadoresVivos;
+    }
 
     public void movimiento(int id , int x, int y) {
         listaJugadores.get(id).setX(x);
@@ -93,7 +96,7 @@ public class BombermanServidor implements InterfazBomberman {
     }
 
     public void reiniciarPartida() {
-        this.estadoPartida = false;
+        this.partidaActiva = false;
         this.totalJugadores = 0;
         this.jugadoresVivos = 0;
         this.contIdBombas =0 ;
