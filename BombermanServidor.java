@@ -33,6 +33,7 @@ public class BombermanServidor implements InterfazBomberman {
         if (!partidaActiva && N > 0) { // Almenos un jugador (prueba)
             partidaActiva = true;
             totalJugadores = N;
+            mapa.cargarMapa("map.txt");
             return true;
         } 
         else return false; 
@@ -61,7 +62,7 @@ public class BombermanServidor implements InterfazBomberman {
     public void movimiento(int id , int x, int y) {
         listaJugadores.get(id).setX(x);
         listaJugadores.get(id).setY(y);
-        System.out.println("jugador: " + id + " mov: (" + x + ", " + y + ")");
+        // System.out.println("jugador: " + id + " mov: (" + x + ", " + y + ")");
     }
 
     public InterfazEstadoPartida obtenerEstado() {
@@ -86,6 +87,7 @@ public class BombermanServidor implements InterfazBomberman {
     }
 
     public void eliminacion(int id){
+        System.out.println("[solicitud]: Eliminar jugador " + id);
         for (int i = 0; i < listaJugadores.size(); i++) {
             Jugador jugador = listaJugadores.get(i);
             if (jugador.getId() == id) {
@@ -99,7 +101,7 @@ public class BombermanServidor implements InterfazBomberman {
         this.partidaActiva = false;
         this.totalJugadores = 0;
         this.jugadoresVivos = 0;
-        this.contIdBombas =0 ;
+        this.contIdBombas = 0;
         this.listaJugadores.clear();
         this.listaBombas.clear();
     }

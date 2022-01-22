@@ -31,8 +31,8 @@ public class Main {
         }
 
         System.out.println("Frecuencia de actualizacion: ");
-        int frecuencia = sc.nextInt();
-        cliente.setFrecuencia(frecuencia);
+        int fps = sc.nextInt();
+        cliente.setFrecuencia(fps);
 
         System.out.println("Ingresa tu apodo: ");
         String nombre = sc.next();
@@ -66,13 +66,28 @@ public class Main {
             cliente.limpiarPantalla();
 
             cliente.dibujarMapa();
-            
+
+            corriendoPartida = cliente.getEstadoPartida(); 
 
             ticks++;
-            if (ticks >= 1000/frecuencia){
+            if (ticks >= fps){
                 ticks = 0;
             }
             //System.out.println("Ticks: " + ticks);
         }
+        System.out.println("\tEl juego terminó!");
+        try {
+            Thread.sleep(1000);
+        } catch (Exception e) {
+        }
+        cliente.limpiarPantalla();
+        if (cliente.getEstadoJugador()){
+            System.out.println("\t\tFelicidades!!");
+            System.out.println("\tEres el ganador");
+            
+        } else {
+            System.out.println("\tSuerte para la proxima!!"); 
+        }
+        
     }
 }

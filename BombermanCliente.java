@@ -2,9 +2,10 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 
+
 public class BombermanCliente {
     private int N; 
-    private int fps;
+    private double tmpFrecuencia;
     private Mapa mapa;
     private Mapa mapaObjetos; // Mapa con objetos
     private Jugador jugador;
@@ -13,6 +14,8 @@ public class BombermanCliente {
     private InterfazBomberman stub;
     private ArrayList<Bomba> listaBombas;
     private ArrayList<Jugador> listaJugadores;
+    public static int RADIO = 2;
+    private boolean partidaCorriendo;
 
     public BombermanCliente() {
         this.N = 0;
@@ -21,9 +24,11 @@ public class BombermanCliente {
         this.mapaObjetos = new Mapa();
         this.jugador = new Jugador();
         this.jugadoresVivos = 0;
+        this.tmpFrecuencia = 0;
         this.stub = null;
-        this.listaJugadores = new ArrayList<Jugador>();;
-        this.listaBombas = new ArrayList<Bomba>();;
+        this.listaJugadores = new ArrayList<Jugador>();
+        this.listaBombas = new ArrayList<Bomba>();
+        this.partidaCorriendo = false;
     }
 
     public void asociarStub(InterfazBomberman Stub){
@@ -41,9 +46,9 @@ public class BombermanCliente {
         return estadoPartida;
     }
 
-    public void setFrecuencia(int frecuencia){
-        this.fps = (int) (1000 / frecuencia);
-        System.out.println("fps: "+ fps);
+    public void setFrecuencia(int fps){
+        this.tmpFrecuencia = (double) ( (1000.00 / (double) fps) + 0.5 );
+        System.out.println("tiempo de frecuencia: "+ tmpFrecuencia + "ms");
     }
 
     public boolean unirsePartida(String nombre){
@@ -66,6 +71,7 @@ public class BombermanCliente {
             this.N = info.getN();// Numero de jugadores
             this.mapaObjetos.setRen(info.getRen());
             this.mapaObjetos.setCol(info.getCol());
+            this.partidaCorriendo = true;
             return true;
         } 
         else return false;
@@ -107,6 +113,13 @@ public class BombermanCliente {
         }
 
         this.listaJugadores = nuevoEstado.getListaJugadores();
+        this.jugadoresVivos = listaJugadores.size();
+        if (jugadoresVivos == 1){
+            this.partidaCorriendo = false;
+            for (Bomba b : listaBombas) {
+                b.setEstadoBomba(true);
+            }
+        }
         ArrayList<Bomba> nuevaListaBombas = nuevoEstado.getListaBombas();
 
         boolean agregarBomba = true;
@@ -120,7 +133,7 @@ public class BombermanCliente {
             if (agregarBomba){
                 Bomba nb = new Bomba(b.getIdBomba(), b.getX(), b.getY(), b.getIdPropietario());
                 // nb.setTicksParaExplotar(fps * 3);//3 seg para explotar
-                nb.setTicksParaExplotar((1000 / fps) * 3);//3 seg para explotar
+                nb.setTicksParaExplotar((int)(1000 / tmpFrecuencia) * 3);//3 seg para explotar
                 // nb.setTicksParaExplotar(300);//3 seg para explotar
                 listaBombas.add(nb);
             }
@@ -128,23 +141,18 @@ public class BombermanCliente {
     }
 
     public void actualizarMapa(){
-        /**
-         * Aqui se puede actualizar el timer de las bombas (cada : fps * 3 ticks)
-         */
-        // ifor (Bomba b : this.listaBombas) {
         for (int i = 0; i < listaBombas.size(); i++) {
             Bomba b = listaBombas.get(i);
             // System.out.println("aqui");
             b.setTickActual(b.getTickActual() + 1);
             // System.out.println("my tick: " + b.getTickActual());
             // System.out.println("my tick to ex: " + b.getTicksParaExplotar());
-            if (b.getTickActual() >= b.getTicksParaExplotar()){
-                // b.setEstadoBomba(true);
-                /**
-                 * VAlidar radio de la explosion y si el jugador murió
-                 */
-                //m.validarRadio(b.getX(),b.getY());
+            if (b.getTickActual() >= b.getTicksParaExplotar() && b.getEstadoBomba() == false){
+                b.setEstadoBomba(true);
+                explosionBomba(b);
+                
                 if (b.getIdPropietario() == this.jugador.getId()){
+                    System.out.println("[eliminar bomba " + b.getIdBomba() + " del servidor]");
                     try {
                         stub.quitarBomba(b.getIdBomba());//quitar bomba del servidor       
                     } catch (Exception e) {
@@ -156,7 +164,6 @@ public class BombermanCliente {
                 listaBombas.remove(b);
             }
         }
-        
         
         //recuperar mapa original
         mapaObjetos.setMapa(mapa.getMapa());
@@ -170,18 +177,46 @@ public class BombermanCliente {
         }
         
         for (Bomba b  : listaBombas) {
-            mapaObjetos.asignaObjeto(b.getX(), b.getY(), mapaObjetos.BOMBA);
+            if (b.getEstadoBomba() == false){// Bomba activa/ aun no explota
+                mapaObjetos.asignaObjeto(b.getX(), b.getY(), mapaObjetos.BOMBA);
+            }
         }
 
-
         try {
-            Thread.sleep((long) fps);
+            Thread.sleep((long) tmpFrecuencia);
         } catch (Exception e) {
             System.out.println("Excepcion del cliente: fps");
             e.printStackTrace();
         }
 
         m.setMapa(mapaObjetos.getMapa());
+    }
+
+    // Verifica si un jugador se encontraba cerca de la bomba
+    private void explosionBomba (Bomba b) {
+        System.out.println("id: " + b.getIdBomba());
+        boolean eliminarJugador = false;
+
+        eliminarJugador = mapaObjetos.jugadorEnRadio(b.getX(), b.getY(), RADIO);
+        
+        if (eliminarJugador) {
+            this.jugador.setEstado(false);
+            this.partidaCorriendo = false;
+            try {
+                stub.eliminacion(this.jugador.getId());
+            } catch (Exception e) {
+                System.out.println("Excepcion del cliente");
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    public boolean getEstadoPartida() {
+        return partidaCorriendo;
+    }
+
+    public boolean getEstadoJugador(){
+        return this.jugador.getEstado();
     }
 
     public void dibujarMapa(){

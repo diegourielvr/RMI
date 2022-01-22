@@ -27,6 +27,10 @@ public class Bomba implements InterfazBomba{
     public int getX() {
         return x;
     }
+    
+    public int getY() {
+        return y;
+    }
 
     public int getTicksParaExplotar(){
         return this.ticksParaExplotar;
@@ -44,9 +48,6 @@ public class Bomba implements InterfazBomba{
         this.tickActual = t;
     }
 
-    public int getY() {
-        return y;
-    }
 
     public int getIdPropietario() {
         return idPropietario;

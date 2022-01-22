@@ -2,7 +2,6 @@ import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.rmi.RemoteException;
-import java.util.concurrent.ConcurrentHashMap.KeySetView;
 public class MovimientoJugador implements KeyListener {
     private int x;
     private int y;
@@ -11,8 +10,8 @@ public class MovimientoJugador implements KeyListener {
     private int col;
     private int [][] mapa;
     private InterfazBomberman stub;
-    private static int PARED = -1;
-    private static int BOMBA = 3;
+    private static int PARED = 1;
+    private static int BOMBA = 4;
     
     MovimientoJugador (int id, int x, int y, int ren, int col, InterfazBomberman stub){
         this.id = id;//id de jugador

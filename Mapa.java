@@ -1,12 +1,16 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 public class Mapa {
     private int ren;
     private int col;
     private int[][] mapa;
     public int VACIO = 0;
-    public int PARED = -1;
-    public int JUGADOR = 1;
-    public int JUGADOR_EXTERNO = 2;
-    public int BOMBA = 3;
+    public int PARED = 1;
+    public int JUGADOR = 2;
+    public int JUGADOR_EXTERNO = 3;
+    public int BOMBA = 4;
 
 
     Mapa() {
@@ -15,21 +19,35 @@ public class Mapa {
         mapa = new int[ren][col];
         for (int i = 0; i < ren; i++) {
             for (int j = 0; j < col; j++) {
-                if (i == 0 || i == ren-1 || j == 0 || j == col-1){ // Bordes
+                if (i % 2 == 0 && j % 2 == 0){
+                    this.mapa[i][j] = PARED;
+                }
+                else if (i == 0 || i == ren-1 || j == 0 || j == col-1){ // Bordes
                     this.mapa[i][j] = PARED;
                 }
                 else {
                     this.mapa[i][j] = VACIO;
-                }
-                if (i % 2 == 0 && j % 2 == 0){
-                    this.mapa[i][j] = PARED;
                 }
             }
         }
     }
 
     public void cargarMapa(String archivo){
-
+        File f = new File (archivo);
+        Scanner sc = null;
+        try {   
+            sc =  new Scanner(f);
+        } catch (FileNotFoundException e) {
+            System.out.println("Error al abrir el archivo");
+        }
+        for (int i = 0; i < ren; i++) {
+            for (int j = 0 ; j < ren; j++) {
+                if (sc.hasNext()) {
+                    this.mapa[i][j] = Integer.parseInt(sc.next());
+                }
+            }
+        }
+        sc.close();       
     }
 
     public void asignaObjeto(int ren ,int col, int obj){
@@ -68,17 +86,46 @@ public class Mapa {
         for (int i = 0; i < ren; i++) {
             for (int j = 0; j < col; j++) {
                 if (mapa[i][j] == PARED)
-                    System.out.print("🌀");
+                    System.out.print("💠");//🌀
                 if (mapa[i][j] == VACIO)
                     System.out.print("  ");//🔲
                 if (mapa[i][j] == JUGADOR)
-                    System.out.print("🥶");
+                    System.out.print("🐼");
                 if (mapa[i][j] == JUGADOR_EXTERNO)
-                    System.out.print("🥵");
+                    System.out.print("🐻");
                 if (mapa[i][j] == BOMBA)
-                    System.out.print("💣");
+                    System.out.print("🔥");//💣💥
             }
             System.out.println("");
         }     
+    }
+
+    public boolean jugadorEnRadio(int x, int y, int radio){
+        boolean jugadorEliminado = false;
+        int i = 0;
+        while (i <= radio && mapa[x][y - i] != PARED && jugadorEliminado == false){//Izq
+            if (mapa[x][y - i] == JUGADOR)
+                jugadorEliminado = true;
+            i++;
+        }
+        i = 0;
+        while (i <= radio && mapa[x - i][y] != PARED && jugadorEliminado == false){//arriba
+            if (mapa[x - i][y] == JUGADOR)
+                jugadorEliminado = true;
+            i++;
+        }
+        i = 0;
+        while (i <= radio && mapa[x][y + i] != PARED && jugadorEliminado == false){//der
+            if (mapa[x][y + i] == JUGADOR)
+                jugadorEliminado = true;
+            i++;
+        }
+        i = 0;
+        while (i <= radio && mapa[x + i][y] != PARED && jugadorEliminado == false){//abajo
+            if (mapa[x + i][y] == JUGADOR)
+                jugadorEliminado = true;
+            i++;
+        }
+        return jugadorEliminado;
     }
 }
