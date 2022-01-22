@@ -147,12 +147,11 @@ public class BombermanCliente {
             b.setTickActual(b.getTickActual() + 1);
             // System.out.println("my tick: " + b.getTickActual());
             // System.out.println("my tick to ex: " + b.getTicksParaExplotar());
-            if (b.getTickActual() >= b.getTicksParaExplotar() && b.getEstadoBomba() == false){
+            if (b.getEstadoBomba() == false && b.getTickActual() >= b.getTicksParaExplotar()){
                 b.setEstadoBomba(true);
                 explosionBomba(b);
                 
                 if (b.getIdPropietario() == this.jugador.getId()){
-                    System.out.println("[eliminar bomba " + b.getIdBomba() + " del servidor]");
                     try {
                         stub.quitarBomba(b.getIdBomba());//quitar bomba del servidor       
                     } catch (Exception e) {
@@ -160,7 +159,13 @@ public class BombermanCliente {
                         e.printStackTrace();
                     }
                 }
-                // listaBombas.remove(ib);
+                // listaBombas.remove(b);
+            }
+            /* Eliminar la bomba despues de 1 segundo de haber explotado
+             * para que el jugador que la puso, le de tiempo de quitarla
+             * y los demás no agreguen 2 veces la misma bomba
+             */
+            if (b.getEstadoBomba() == true && b.getTickActual() >= (b.getTicksParaExplotar() + (1000 / tmpFrecuencia))){
                 listaBombas.remove(b);
             }
         }
@@ -198,7 +203,7 @@ public class BombermanCliente {
         boolean eliminarJugador = false;
 
         eliminarJugador = mapaObjetos.jugadorEnRadio(b.getX(), b.getY(), RADIO);
-        
+
         if (eliminarJugador) {
             this.jugador.setEstado(false);
             this.partidaCorriendo = false;

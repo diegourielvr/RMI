@@ -4,28 +4,33 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 
 public class BombermanServidor implements InterfazBomberman {
+
     private Mapa mapa;
-    private int totalJugadores;
-    private int jugadoresVivos;
-    private boolean partidaActiva;
+    private int contIdBombas; // A cada bomba se le asigna un id
+    private int totalJugadores; // Total de jugadores en la partida
+    private int jugadoresVivos; // Jugadores restantes en la partida
+    private boolean partidaActiva; // false: sin partida
     private ArrayList<Jugador> listaJugadores;
     private ArrayList<Bomba> listaBombas;
-    private ArrayList<Posicion> posIniciales;
-    private int contIdBombas; // id de una nueva bomba
+    private ArrayList<Posicion> posIniciales; // Posicion del mapa en la que aparece cada jugador
     
     BombermanServidor() {
-        mapa = new Mapa();
-        totalJugadores = 0;
-        jugadoresVivos = 0;
-        partidaActiva = false;
-        listaJugadores = new ArrayList<Jugador>();
-        listaBombas = new ArrayList<Bomba>();
-        posIniciales = new ArrayList<Posicion>();
-        posIniciales.add(new Posicion (1, 1));
-        posIniciales.add(new Posicion (1, mapa.getCol() - 2));
-        posIniciales.add(new Posicion (mapa.getRen() - 2, 1));
-        posIniciales.add(new Posicion (mapa.getRen() - 2, mapa.getCol() - 2));
-        contIdBombas = 0;
+        this.mapa = new Mapa();
+        this.totalJugadores = 0;
+        this.jugadoresVivos = 0;
+        this.partidaActiva = false;
+        this.listaJugadores = new ArrayList<Jugador>();
+        this.listaBombas = new ArrayList<Bomba>();
+        this.posIniciales = new ArrayList<Posicion>();
+        initPosIniciales();
+        this.contIdBombas = 0;
+    }
+    
+    private void initPosIniciales() {
+        this.posIniciales.add(new Posicion (1, 1));
+        this.posIniciales.add(new Posicion (1, mapa.getCol() - 2));
+        this.posIniciales.add(new Posicion (mapa.getRen() - 2, 1));
+        this.posIniciales.add(new Posicion (mapa.getRen() - 2, mapa.getCol() - 2));
     }
 
     public boolean nuevaPartida(int N){
@@ -82,7 +87,6 @@ public class BombermanServidor implements InterfazBomberman {
                 listaBombas.remove(bomba);
                 return;
             }
-            // Si la función es exitosa se puede implementar en eliminacion() v
         }
     }
 
