@@ -2,36 +2,19 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-public class Mapa {
-    private int ren;
-    private int col;
+public class Mapa implements InterfazMapa {
+    private int alto; // ren
+    private int ancho; // col
     private int[][] mapa;
-    public int VACIO = 0;
-    public int PARED = 1;
-    public int JUGADOR = 2;
-    public int JUGADOR_EXTERNO = 3;
-    public int BOMBA = 4;
-
-
+    
     Mapa() {
-        this.ren = 17;
-        this.col = 17;
-        mapa = new int[ren][col];
-        for (int i = 0; i < ren; i++) {
-            for (int j = 0; j < col; j++) {
-                if (i % 2 == 0 && j % 2 == 0){
-                    this.mapa[i][j] = PARED;
-                }
-                else if (i == 0 || i == ren-1 || j == 0 || j == col-1){ // Bordes
-                    this.mapa[i][j] = PARED;
-                }
-                else {
-                    this.mapa[i][j] = VACIO;
-                }
-            }
-        }
+        this.alto = 17;
+        this.ancho = 17;
     }
 
+    public void initMapa() {
+        this.mapa = new int[this.alto][this.ancho];
+    }
     public void cargarMapa(String archivo){
         File f = new File (archivo);
         Scanner sc = null;
@@ -40,8 +23,17 @@ public class Mapa {
         } catch (FileNotFoundException e) {
             System.out.println("Error al abrir el archivo");
         }
-        for (int i = 0; i < ren; i++) {
-            for (int j = 0 ; j < ren; j++) {
+
+        // Obtener ancho y alto del mapa
+        if (sc.hasNext())
+            this.alto = Integer.parseInt(sc.next());
+        if (sc.hasNext())
+            this.ancho = Integer.parseInt(sc.next());
+
+        this.mapa = new int[this.alto][this.ancho];
+        // Obtener objetos del mapa
+        for (int i = 0; i < alto; i++) {
+            for (int j = 0; j < ancho; j++) {
                 if (sc.hasNext()) {
                     this.mapa[i][j] = Integer.parseInt(sc.next());
                 }
@@ -50,24 +42,24 @@ public class Mapa {
         sc.close();       
     }
 
-    public void asignaObjeto(int ren ,int col, int obj){
-        this.mapa[ren][col] = obj;
+    public void agregarEntidad(int x, int y, int ent) {
+        this.mapa[y][x] = ent;
     }
 
-    public int getRen() { 
-        return this.ren; 
+    public int getAlto() { 
+        return this.alto; 
     }
 
-    public void setRen(int ren){
-        this.ren = ren;
+    public void setAlto(int alto) {
+        this.alto = alto;
     } 
 
-    public int getCol() { 
-        return this.col; 
+    public int getAncho() { 
+        return this.ancho; 
     }
 
-    public void setCol(int col){
-        this.col = col;
+    public void setAncho(int ancho){
+        this.ancho = ancho;
     }
 
     public int[][] getMapa() { 
@@ -75,54 +67,54 @@ public class Mapa {
     }
 
     public void setMapa (int[][] nuevoMapa){
-        for (int i = 0; i < ren; i++) {
-            for (int j = 0; j < col; j++) {
-                this.mapa[i][j] = nuevoMapa[i][j];
+        for (int i = 0; i < alto; i++) {
+            for (int j = 0; j < ancho; j++) {
+                mapa[i][j] = nuevoMapa[i][j];
             }
         }
     }
 
     public void mostrarMapa(){
-        for (int i = 0; i < ren; i++) {
-            for (int j = 0; j < col; j++) {
+        for (int i = 0; i < this.alto; i++) {
+            for (int j = 0; j < this.ancho; j++) {
                 if (mapa[i][j] == PARED)
                     System.out.print("💠");//🌀
                 if (mapa[i][j] == VACIO)
                     System.out.print("  ");//🔲
                 if (mapa[i][j] == JUGADOR)
                     System.out.print("🐼");
-                if (mapa[i][j] == JUGADOR_EXTERNO)
+                if (mapa[i][j] == ENEMIGO)
                     System.out.print("🐻");
                 if (mapa[i][j] == BOMBA)
                     System.out.print("🔥");//💣💥
             }
-            System.out.println("");
+            System.out.println();
         }     
     }
 
     public boolean jugadorEnRadio(int x, int y, int radio){
         boolean jugadorEliminado = false;
         int i = 0;
-        while (i <= radio && mapa[x][y - i] != PARED && jugadorEliminado == false){//Izq
-            if (mapa[x][y - i] == JUGADOR)
+        while (i <= radio && mapa[y][x - i] != PARED && jugadorEliminado == false){//Izq
+            if (mapa[y][x - i] == JUGADOR)
                 jugadorEliminado = true;
             i++;
         }
         i = 0;
-        while (i <= radio && mapa[x - i][y] != PARED && jugadorEliminado == false){//arriba
-            if (mapa[x - i][y] == JUGADOR)
+        while (i <= radio && mapa[y - i][x] != PARED && jugadorEliminado == false){//arriba
+            if (mapa[y - i][x] == JUGADOR)
                 jugadorEliminado = true;
             i++;
         }
         i = 0;
-        while (i <= radio && mapa[x][y + i] != PARED && jugadorEliminado == false){//der
-            if (mapa[x][y + i] == JUGADOR)
+        while (i <= radio && mapa[y][x + i] != PARED && jugadorEliminado == false){//der
+            if (mapa[y][x + i] == JUGADOR)
                 jugadorEliminado = true;
             i++;
         }
         i = 0;
-        while (i <= radio && mapa[x + i][y] != PARED && jugadorEliminado == false){//abajo
-            if (mapa[x + i][y] == JUGADOR)
+        while (i <= radio && mapa[y + i][x] != PARED && jugadorEliminado == false){//abajo
+            if (mapa[y + i][x] == JUGADOR)
                 jugadorEliminado = true;
             i++;
         }

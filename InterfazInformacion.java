@@ -1,7 +1,6 @@
 import java.io.Serializable;
 /**
  * Informacion inicial para el jugador
- * Devuelve 
  */
 public interface InterfazInformacion extends Serializable {
     /**
@@ -27,12 +26,12 @@ public interface InterfazInformacion extends Serializable {
     /**
      * @return número de renglones del mapa
      */
-    public int getRen();
+    public int getAlto();
     
     /**
      * @return número de columnas del mapa
      */
-    public int getCol();
+    public int getAncho();
 
     /**
      *  @return informacion del mapa

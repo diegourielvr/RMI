@@ -53,41 +53,27 @@ public class Main {
         cliente.asignarControles();
 
         boolean corriendoPartida = true;
-        int ticks = 0;
 
         while(corriendoPartida){
-            
-            // obtener listas de jugadores y bombas
-            cliente.actualizarObjetos();
-            
-            //Pendiente: llevar un conteo de ticks en las bombas
+            cliente.actualizarEntidades();
             cliente.actualizarMapa();
-            
             cliente.limpiarPantalla();
-
             cliente.dibujarMapa();
-
             corriendoPartida = cliente.getEstadoPartida(); 
-
-            ticks++;
-            if (ticks >= fps){
-                ticks = 0;
-            }
-            //System.out.println("Ticks: " + ticks);
         }
+
         System.out.println("\tEl juego terminó!");
         try {
             Thread.sleep(1000);
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
         cliente.limpiarPantalla();
+
         if (cliente.getEstadoJugador()){
             System.out.println("\t\tFelicidades!!");
             System.out.println("\tEres el ganador");
-            
         } else {
             System.out.println("\tSuerte para la proxima!!"); 
         }
-        
+        System.exit(0);
     }
 }

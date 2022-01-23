@@ -3,8 +3,8 @@ public class Informacion implements InterfazInformacion{
     private int x;
     private int y;
     private int N;
-    private int ren;
-    private int col;
+    private int alto;
+    private int ancho;
     private int[][] mapa;
 
     Informacion() {
@@ -12,31 +12,45 @@ public class Informacion implements InterfazInformacion{
         this.x = 0;
         this.y = 0;
         this.N = 0;
-        this.ren = 0;
-        this.col = 0;
+        this.alto = 0;
+        this.ancho = 0;
     }
 
-    Informacion(int id, int x, int y, int ren, int col, int N, int[][] mapa) {
+    Informacion(int id, int x, int y, int alto, int ancho, int N, int[][] mapa) {
         this.id = id;
         this.x = x;
         this.y = y;
         this.N = N;
-        this.ren = ren;
-        this.col = col;
+        this.alto = alto;
+        this.ancho = ancho;
         this.mapa = mapa;
     }
 
-    public int getId() { return this.id; }
+    public int getId() { 
+        return this.id; 
+    }
 
-    public int getPosX() { return this.x; }
+    public int getPosX() { 
+        return this.x; 
+    }
     
-    public int getPosY() { return this.y; }
+    public int getPosY() { 
+        return this.y; 
+    }
     
-    public int getN() { return this.N; }
+    public int getN() { 
+        return this.N; 
+    }
     
-    public int getRen() { return this.ren; }
+    public int getAlto() { 
+        return this.alto; 
+    }
     
-    public int getCol() { return this.col; }
-    
-    public int[][] getMapa() { return this.mapa; }
+    public int getAncho() { 
+        return this.ancho; 
+    }
+
+    public int[][] getMapa() { 
+        return this.mapa; 
+    }
 }

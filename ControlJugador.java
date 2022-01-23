@@ -2,62 +2,52 @@ import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.rmi.RemoteException;
-public class MovimientoJugador implements KeyListener {
-    private int x;
-    private int y;
-    private int id;
-    private int ren;
-    private int col;
+
+public class ControlJugador implements KeyListener, InterfazMapa {
+    private int x; // pos x del jugador
+    private int y; // pos y del jugador
+    private int id; // id del jugador
     private int [][] mapa;
     private InterfazBomberman stub;
-    private static int PARED = 1;
-    private static int BOMBA = 4;
     
-    MovimientoJugador (int id, int x, int y, int ren, int col, InterfazBomberman stub){
-        this.id = id;//id de jugador
+    ControlJugador (int id, int x, int y, InterfazBomberman stub){
+        this.id = id;
         this.x = x;
         this.y = y;
-        this.ren = ren;
-        this.col = col;
         this.stub = stub;
-        this.mapa =  new int[ren][col];
     }
-    public void escucha (){
-        Frame f = new Frame();
+
+    public void escucha (String nombre){
+        Frame f = new Frame(nombre);
         f.setVisible(true);
         f.addKeyListener(this);
     }
 
-    // AReferencia a mapa con Objetos
-    public void setMapa (int[][] mapa){
+    // Referencia a mapa con entidades
+    public void sincronizarMapa (int[][] mapa){
         this.mapa = mapa;
     }
-    
-    public boolean validarRadio(int b_x, int b_y){//recibe la posicion de la bobma
-        boolean jugadorMuerto = false;
-        // int radio = 3;
-        return jugadorMuerto;
-    }
+
     @Override
     public void keyPressed (KeyEvent e){
         if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_W) {
-            if (mapa[x-1][y] != PARED && mapa[x-1][y] != BOMBA)
-                x -= 1;
+            if (mapa[y-1][x] != PARED && mapa[y-1][x] != BOMBA)
+                y -= 1;
         }
         
         if (e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D) {
-            if (mapa[x][y+1] != PARED && mapa[x][y+1] != BOMBA)
-                y += 1;
+            if (mapa[y][x+1] != PARED && mapa[y][x+1] != BOMBA)
+                x += 1;
         }
     
         if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_S) {
-            if (mapa[x+1][y] != PARED && mapa[x+1][y] != BOMBA)
-                x += 1;
+            if (mapa[y+1][x] != PARED && mapa[y+1][x] != BOMBA)
+                y += 1;
         }
         
         if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A) {
-            if (mapa[x][y-1] != PARED && mapa[x][y-1] != BOMBA)
-                y -= 1;
+            if (mapa[y][x-1] != PARED && mapa[y][x-1] != BOMBA)
+                x -= 1;
         }
 
         if (e.getKeyCode() == KeyEvent.VK_SPACE) {
@@ -74,6 +64,7 @@ public class MovimientoJugador implements KeyListener {
             e1.printStackTrace();
         }
     }
+
     @Override
     public void keyReleased (KeyEvent e){}
 

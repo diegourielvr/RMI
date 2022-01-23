@@ -8,8 +8,7 @@
     ```
 * Desde la carpeta **RMI/** compilar con:
     ```
-    javac -d ./bin/ Informacion.java Jugador.java BombermanCliente.java InterfazBomberman.java Mapa.java BombermanServidor.java InterfazEstadoPartida.java Posicion.java EstadoPartida.java InterfazInformacion.java MovimientoJugador.java Bomba.java InterfazBomba.java Main.java
-
+    javac -d ./bin/ Informacion.java Jugador.java BombermanCliente.java InterfazBomberman.java Mapa.java BombermanServidor.java InterfazEstadoPartida.java InterfazJugador.java Posicion.java EstadoPartida.java InterfazInformacion.java ControlJugador.java Bomba.java InterfazBomba.java Main.java
     ```
 ## Ejecutar servicio *rmiregistry*
 * RMI/bin$: 

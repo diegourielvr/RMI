@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class EstadoPartida implements InterfazEstadoPartida{
+public class EstadoPartida implements InterfazEstadoPartida {
     private ArrayList<Jugador> listaJugadores;
     private ArrayList<Bomba> listaBombas;
 
@@ -15,14 +15,10 @@ public class EstadoPartida implements InterfazEstadoPartida{
     }
 
     public ArrayList<Jugador> getListaJugadores() {
-        return listaJugadores;
+        return this.listaJugadores;
     }
 
-    // public void setListaJugadores(ArrayList<Jugador> lista){
-    //     this.listaJugadores = lista;
-    // } 
-
     public ArrayList<Bomba> getListaBombas() {
-        return listaBombas;
+        return this.listaBombas;
     }
 }

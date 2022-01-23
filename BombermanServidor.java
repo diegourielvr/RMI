@@ -4,9 +4,8 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 
 public class BombermanServidor implements InterfazBomberman {
-
     private Mapa mapa;
-    private int contIdBombas; // A cada bomba se le asigna un id
+    private int idBomba; // A cada bomba se le asigna un id
     private int totalJugadores; // Total de jugadores en la partida
     private int jugadoresVivos; // Jugadores restantes en la partida
     private boolean partidaActiva; // false: sin partida
@@ -16,58 +15,67 @@ public class BombermanServidor implements InterfazBomberman {
     
     BombermanServidor() {
         this.mapa = new Mapa();
+        this.idBomba = 0;
         this.totalJugadores = 0;
         this.jugadoresVivos = 0;
         this.partidaActiva = false;
         this.listaJugadores = new ArrayList<Jugador>();
         this.listaBombas = new ArrayList<Bomba>();
         this.posIniciales = new ArrayList<Posicion>();
-        initPosIniciales();
-        this.contIdBombas = 0;
+    }
+    
+    public boolean nuevaPartida(int N){ // Método remoto
+        System.out.println("[solicitud]: Crear nueva partida.");
+        boolean partidaCreada = false;
+        if (!this.partidaActiva && N > 0) {
+            this.partidaActiva = true;
+            this.totalJugadores = N;
+            this.mapa.cargarMapa("map.txt");
+            initPosIniciales();
+            partidaCreada = true;
+        }  
+        return partidaCreada;
     }
     
     private void initPosIniciales() {
-        this.posIniciales.add(new Posicion (1, 1));
-        this.posIniciales.add(new Posicion (1, mapa.getCol() - 2));
-        this.posIniciales.add(new Posicion (mapa.getRen() - 2, 1));
-        this.posIniciales.add(new Posicion (mapa.getRen() - 2, mapa.getCol() - 2));
+        this.posIniciales.add(new Posicion (1, 1)); // Jugador 1
+        this.posIniciales.add(new Posicion (mapa.getAncho()-2, 1)); // Jugador 2
+        this.posIniciales.add(new Posicion (1, mapa.getAlto() - 2)); // Jugador 3
+        this.posIniciales.add(new Posicion (mapa.getAncho() - 2, mapa.getAlto() - 2)); // Jugador 4
     }
-
-    public boolean nuevaPartida(int N){
-        System.out.println("[solicitud]: Crear nueva partida.");
-        if (!partidaActiva && N > 0) { // Almenos un jugador (prueba)
-            partidaActiva = true;
-            totalJugadores = N;
-            mapa.cargarMapa("map.txt");
-            return true;
-        } 
-        else return false; 
-    }
-
+    
     public InterfazInformacion nuevoJugador(String nombre) {
         System.out.println("[solicitud]: Nuevo jugador (" + nombre + ")");
         if (jugadoresVivos < totalJugadores) {
             int id = jugadoresVivos; 
+            jugadoresVivos += 1;
+
+            // Agregar nuevo jugador a la lista
             Jugador nuevoJugador = new Jugador(id, posIniciales.get(id).getX(),
                             posIniciales.get(id).getY(), true, nombre);
+                            
+            // Devolver informacion del jugador creado y mapa
             Informacion info = new Informacion(id, nuevoJugador.getX(), 
-                            nuevoJugador.getY(), mapa.getRen(),
-                            mapa.getCol(), totalJugadores, mapa.getMapa());
+                                    nuevoJugador.getY(), mapa.getAlto(),
+                                    mapa.getAncho(), totalJugadores, mapa.getMapa());
             listaJugadores.add(nuevoJugador);
-            jugadoresVivos += 1;
             return info;
-        }
-        else return null; // partida llena
+        } else 
+            return null; // partida llena
     }
 
     public int partidaLista() { 
-        return jugadoresVivos;
+        return this.jugadoresVivos;
     }
 
-    public void movimiento(int id , int x, int y) {
-        listaJugadores.get(id).setX(x);
-        listaJugadores.get(id).setY(y);
-        // System.out.println("jugador: " + id + " mov: (" + x + ", " + y + ")");
+    public void movimiento(int id, int x, int y) {
+        for (Jugador j : listaJugadores) {
+            if (j.getId() == id){
+                j.setX(x);
+                j.setY(y);
+                break;
+            }
+        }
     }
 
     public InterfazEstadoPartida obtenerEstado() {
@@ -76,15 +84,14 @@ public class BombermanServidor implements InterfazBomberman {
     }
 
     public void ponerBomba(int idPropietario, int x, int y) {
-        int idBomba = contIdBombas;
-        contIdBombas += 1;
-        listaBombas.add(new Bomba(idBomba, x, y, idPropietario));
+        this.listaBombas.add(new Bomba(this.idBomba, x, y, idPropietario));
+        idBomba += 1;
     }
 
     public void quitarBomba(int idBomba){
         for (Bomba bomba : listaBombas) {
             if (bomba.getIdBomba() == idBomba){
-                listaBombas.remove(bomba);
+                this.listaBombas.remove(bomba);
                 return;
             }
         }
@@ -100,16 +107,7 @@ public class BombermanServidor implements InterfazBomberman {
             }
         }
     }
-
-    public void reiniciarPartida() {
-        this.partidaActiva = false;
-        this.totalJugadores = 0;
-        this.jugadoresVivos = 0;
-        this.contIdBombas = 0;
-        this.listaJugadores.clear();
-        this.listaBombas.clear();
-    }
-
+    
     public static void main(String[] args) {
         try {
             BombermanServidor obj = new BombermanServidor();

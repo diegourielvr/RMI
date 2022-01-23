@@ -1,40 +1,40 @@
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.ArrayList;
 
-
-public class BombermanCliente {
+public class BombermanCliente implements InterfazMapa{
     private int N; 
-    private double tmpFrecuencia;
-    private Mapa mapa;
-    private Mapa mapaObjetos; // Mapa con objetos
-    private Jugador jugador;
     private int jugadoresVivos;
-    private MovimientoJugador m;
+    private long tmpFrecuencia; // Frecuancia a la que se actualiza el mapa
+    private Mapa mapa; // Mapa original (con paredes)
+    private Mapa mapaEntidades; // Mapa con entidades (jugadores y bomba)
+    private Jugador jugador;
+    private ControlJugador control;
     private InterfazBomberman stub;
     private ArrayList<Bomba> listaBombas;
     private ArrayList<Jugador> listaJugadores;
-    public static int RADIO = 2;
     private boolean partidaCorriendo;
 
     public BombermanCliente() {
         this.N = 0;
-        this.m = null;
-        this.mapa = new Mapa();
-        this.mapaObjetos = new Mapa();
-        this.jugador = new Jugador();
-        this.jugadoresVivos = 0;
-        this.tmpFrecuencia = 0;
         this.stub = null;
-        this.listaJugadores = new ArrayList<Jugador>();
-        this.listaBombas = new ArrayList<Bomba>();
+        this.control = null;
+        this.tmpFrecuencia = 0;
+        this.jugadoresVivos = 0;
         this.partidaCorriendo = false;
+        this.mapa = new Mapa();
+        this.jugador = new Jugador();
+        this.mapaEntidades = new Mapa();
+        this.listaBombas = new ArrayList<Bomba>();
+        this.listaJugadores = new ArrayList<Jugador>();
     }
 
     public void asociarStub(InterfazBomberman Stub){
         this.stub = Stub;
     }
 
+    /** 
+     * Busca una partida, si no existe
+     * crea una partida para N jugadores 
+     */
     public boolean buscarPartida(int N){
         boolean estadoPartida = false;
         try {
@@ -46,8 +46,11 @@ public class BombermanCliente {
         return estadoPartida;
     }
 
+    /**
+     * Frecuencia a la que se actulizan las entidades
+     */
     public void setFrecuencia(int fps){
-        this.tmpFrecuencia = (double) ( (1000.00 / (double) fps) + 0.5 );
+        this.tmpFrecuencia =  (long) (((double)MS / (double) fps) + 0.5);
         System.out.println("tiempo de frecuencia: "+ tmpFrecuencia + "ms");
     }
 
@@ -61,26 +64,26 @@ public class BombermanCliente {
         }
         if (info != null){
             this.jugador.setNombre(nombre);
+            this.jugador.setEstado(true);// Jugador vivo
             this.jugador.setId(info.getId());
             this.jugador.setX(info.getPosX());//pos inicial x
             this.jugador.setY(info.getPosY());//pos inicial y
-            this.jugador.setEstado(true);// Jugador vivo
-            this.mapa.setRen(info.getRen());
-            this.mapa.setCol(info.getCol());
+            this.mapa.setAlto(info.getAlto());
+            this.mapa.setAncho(info.getAncho());
+            this.mapa.initMapa();
             this.mapa.setMapa(info.getMapa());
             this.N = info.getN();// Numero de jugadores
-            this.mapaObjetos.setRen(info.getRen());
-            this.mapaObjetos.setCol(info.getCol());
+            this.mapaEntidades.setAlto(info.getAlto());
+            this.mapaEntidades.setAncho(info.getAncho());
+            this.mapaEntidades.initMapa();
             this.partidaCorriendo = true;
-            return true;
-        } 
-        else return false;
+        }
+        return this.partidaCorriendo;
     }
 
     public void esperarJugadores(){
         int auxJugadoresVivos = 0;
         while (jugadoresVivos < N){
-            //posible error: agregar try-catch
             try {
                 jugadoresVivos = stub.partidaLista();    
             } catch (Exception e) {
@@ -95,15 +98,15 @@ public class BombermanCliente {
     }
 
     public void asignarControles(){
-        m = new MovimientoJugador(this.jugador.getId(),
-            this.jugador.getX(), this.jugador.getY(), this.mapa.getRen(), 
-            this.mapa.getCol(), this.stub);
-
-        m.escucha();
+        control = new ControlJugador(this.jugador.getId(), this.jugador.getX(), 
+                                    this.jugador.getY(), this.stub);
+        control.escucha(this.jugador.getNombre());
     }
 
-    public void actualizarObjetos(){
-        //posible error: agregar try-catch
+    /**
+     * Llamada remota al servidor para obtener estado
+     */
+    public void actualizarEntidades(){
         InterfazEstadoPartida nuevoEstado = null;
         try {    
             nuevoEstado = stub.obtenerEstado();
@@ -112,16 +115,18 @@ public class BombermanCliente {
             e.printStackTrace();
         }
 
+        // Actualizar posiciones de jugadores
         this.listaJugadores = nuevoEstado.getListaJugadores();
         this.jugadoresVivos = listaJugadores.size();
-        if (jugadoresVivos == 1){
+        if (jugadoresVivos == 1){ // Deshabilitar bombas
             this.partidaCorriendo = false;
             for (Bomba b : listaBombas) {
                 b.setEstadoBomba(true);
             }
         }
-        ArrayList<Bomba> nuevaListaBombas = nuevoEstado.getListaBombas();
 
+        // Agregar solo las bombas que no estan en nuestra lista
+        ArrayList<Bomba> nuevaListaBombas = nuevoEstado.getListaBombas();
         boolean agregarBomba = true;
         for (Bomba b : nuevaListaBombas) {
             agregarBomba = true;
@@ -133,76 +138,72 @@ public class BombermanCliente {
             if (agregarBomba){
                 Bomba nb = new Bomba(b.getIdBomba(), b.getX(), b.getY(), b.getIdPropietario());
                 // nb.setTicksParaExplotar(fps * 3);//3 seg para explotar
-                nb.setTicksParaExplotar((int)(1000 / tmpFrecuencia) * 3);//3 seg para explotar
+                nb.setTicksParaExplotar((int)(MS / tmpFrecuencia) * TMP_EXPLOSION);//3 seg para explotar
                 // nb.setTicksParaExplotar(300);//3 seg para explotar
                 listaBombas.add(nb);
             }
         }
     }
 
+    /**
+     * Actualizar el mapa de entidades
+     */
     public void actualizarMapa(){
         for (int i = 0; i < listaBombas.size(); i++) {
             Bomba b = listaBombas.get(i);
-            // System.out.println("aqui");
             b.setTickActual(b.getTickActual() + 1);
-            // System.out.println("my tick: " + b.getTickActual());
-            // System.out.println("my tick to ex: " + b.getTicksParaExplotar());
             if (b.getEstadoBomba() == false && b.getTickActual() >= b.getTicksParaExplotar()){
                 b.setEstadoBomba(true);
-                explosionBomba(b);
-                
+                // Si un jugador es alcanzado por el radio de la bobma, lo eliminamos de la lista
+                calculaRadio(b);
+                //  Quitamos del servido las bombas que son nuestras
                 if (b.getIdPropietario() == this.jugador.getId()){
                     try {
-                        stub.quitarBomba(b.getIdBomba());//quitar bomba del servidor       
+                        stub.quitarBomba(b.getIdBomba());     
                     } catch (Exception e) {
                         System.err.println("Error del cliente: quitarBomba");
                         e.printStackTrace();
                     }
                 }
-                // listaBombas.remove(b);
             }
-            /* Eliminar la bomba despues de 1 segundo de haber explotado
-             * para que el jugador que la puso, le de tiempo de quitarla
+            /*
+             * Eliminar la bomba (local) 1 segundo despues de haber explotado,
+             * para que al propietario le de tiempo de quitarla del servidor
              * y los demás no agreguen 2 veces la misma bomba
              */
-            if (b.getEstadoBomba() == true && b.getTickActual() >= (b.getTicksParaExplotar() + (1000 / tmpFrecuencia))){
+            if (b.getEstadoBomba() == true && b.getTickActual() >= (b.getTicksParaExplotar() + (MS / tmpFrecuencia))){
                 listaBombas.remove(b);
             }
         }
         
-        //recuperar mapa original
-        mapaObjetos.setMapa(mapa.getMapa());
-        // Agregar objetos al mapa
+        // Recuperar mapa original
+        mapaEntidades.setMapa(mapa.getMapa());
+
         for (Jugador j : listaJugadores) {
-            if (j.getId() == this.jugador.getId()){
-                mapaObjetos.asignaObjeto(j.getX(), j.getY(), mapaObjetos.JUGADOR);
-            } else {
-                mapaObjetos.asignaObjeto(j.getX(), j.getY(), mapaObjetos.JUGADOR_EXTERNO);
-            }
+            if (j.getId() == this.jugador.getId())
+                mapaEntidades.agregarEntidad(j.getX(), j.getY(), JUGADOR);
+            else 
+                mapaEntidades.agregarEntidad(j.getX(), j.getY(), ENEMIGO);
         }
         
         for (Bomba b  : listaBombas) {
-            if (b.getEstadoBomba() == false){// Bomba activa/ aun no explota
-                mapaObjetos.asignaObjeto(b.getX(), b.getY(), mapaObjetos.BOMBA);
-            }
+            if (b.getEstadoBomba() == false) // Bomba activa | aun no explota
+                mapaEntidades.agregarEntidad(b.getX(), b.getY(), BOMBA);
         }
 
         try {
             Thread.sleep((long) tmpFrecuencia);
         } catch (Exception e) {
-            System.out.println("Excepcion del cliente: fps");
+            System.out.println("Excepcion del cliente: tmpFrecuencia");
             e.printStackTrace();
         }
-
-        m.setMapa(mapaObjetos.getMapa());
+        control.sincronizarMapa(mapaEntidades.getMapa());
     }
 
     // Verifica si un jugador se encontraba cerca de la bomba
-    private void explosionBomba (Bomba b) {
-        System.out.println("id: " + b.getIdBomba());
+    private void calculaRadio(Bomba b) {
         boolean eliminarJugador = false;
-
-        eliminarJugador = mapaObjetos.jugadorEnRadio(b.getX(), b.getY(), RADIO);
+        eliminarJugador = mapaEntidades.jugadorEnRadio(b.getX(), b.getY(), RADIO);
 
         if (eliminarJugador) {
             this.jugador.setEstado(false);
@@ -210,12 +211,12 @@ public class BombermanCliente {
             try {
                 stub.eliminacion(this.jugador.getId());
             } catch (Exception e) {
-                System.out.println("Excepcion del cliente");
+                System.out.println("Excepcion del cliente: eliminacion");
                 e.printStackTrace();
             }
         }
     }
-    
+   
     public boolean getEstadoPartida() {
         return partidaCorriendo;
     }
@@ -225,12 +226,11 @@ public class BombermanCliente {
     }
 
     public void dibujarMapa(){
-        mapaObjetos.mostrarMapa();            
+        mapaEntidades.mostrarMapa();            
     }
 
     public void limpiarPantalla(){
         System.out.print("\033[H\033[2J"); // Limpiar pantalla
-        // System.out.flush();
     }
 
 }

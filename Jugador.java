@@ -1,4 +1,3 @@
-
 public class Jugador implements InterfazJugador{
     private int id;
     private int pos_x;
@@ -22,19 +21,42 @@ public class Jugador implements InterfazJugador{
         this.nombre = nombre;
     }
 
-    public int getId() { return id; }
-    public void setId(int nuevoId) { this.id = nuevoId;}
+    public int getId() { 
+        return this.id; 
+    }
 
-    public int getX() { return pos_x; }
-    public void setX (int nuevoX) { this.pos_x = nuevoX; }
+    public void setId(int nuevoId) { 
+        this.id = nuevoId;
+    }
 
-    public int getY() { return pos_y; }
-    public void setY (int nuevoY) { this.pos_y = nuevoY; }
+    public int getX() { 
+        return this.pos_x; 
+    }
 
-    public boolean getEstado() { return estado; }
-    public void setEstado(boolean nuevoEstado) { this.estado = nuevoEstado; }
+    public void setX (int nuevoX) { 
+        this.pos_x = nuevoX; 
+    }
 
-    public String getNombre() { return nombre; }
-    public void setNombre (String nuevoNombre) { this.nombre = nuevoNombre; }
+    public int getY() { 
+        return this.pos_y; 
+    }
 
+    public void setY (int nuevoY) { 
+        this.pos_y = nuevoY; 
+    }
+
+    public boolean getEstado() { 
+        return this.estado; 
+    }
+    public void setEstado(boolean nuevoEstado) { 
+        this.estado = nuevoEstado; 
+    }
+
+    public String getNombre() { 
+        return this.nombre; 
+    }
+
+    public void setNombre (String nuevoNombre) { 
+        this.nombre = nuevoNombre; 
+    }
 }
