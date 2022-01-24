@@ -27,7 +27,7 @@ public class BombermanServidor implements InterfazBomberman {
     public boolean nuevaPartida(int N){ // Método remoto
         System.out.println("[solicitud]: Crear nueva partida.");
         boolean partidaCreada = false;
-        if (!this.partidaActiva && N > 0) {
+        if (!this.partidaActiva && N > 1) {
             this.partidaActiva = true;
             this.totalJugadores = N;
             this.mapa.cargarMapa("map.txt");

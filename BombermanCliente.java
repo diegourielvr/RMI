@@ -1,3 +1,5 @@
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.ArrayList;
 
 public class BombermanCliente implements InterfazMapa{
@@ -25,6 +27,16 @@ public class BombermanCliente implements InterfazMapa{
         this.mapaEntidades = new Mapa();
         this.listaBombas = new ArrayList<Bomba>();
         this.listaJugadores = new ArrayList<Jugador>();
+    }
+
+    public void localizarObjetoRemoto(String nombre_obj, String host) {
+        try {
+            Registry registry = LocateRegistry.getRegistry(host);
+            stub = (InterfazBomberman) registry.lookup(nombre_obj);
+        } catch (Exception e) {
+            System.err.println("Error al localizar Objeto Remoto");
+            e.printStackTrace();
+        }
     }
 
     public void asociarStub(InterfazBomberman Stub){

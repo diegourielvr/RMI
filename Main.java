@@ -1,5 +1,3 @@
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.Scanner;
 
 public class Main {
@@ -10,18 +8,18 @@ public class Main {
         System.out.println("🌀🌀 BOMBERMAN GAME 🌀🌀");
 
         // Localizar Objeto Remoto
-        InterfazBomberman Stub = null;
-        try {
-            Registry registry = LocateRegistry.getRegistry(host);
-            Stub = (InterfazBomberman) registry.lookup("Bomberman");
-        } catch (Exception e) {
-            System.err.println("Error al localizar Objeto Remoto");
-            e.printStackTrace();
-        }
+        // InterfazBomberman Stub = null;
+        // try {
+        //     Registry registry = LocateRegistry.getRegistry(host);
+        //     Stub = (InterfazBomberman) registry.lookup("Bomberman");
+        // } catch (Exception e) {
+        //     System.err.println("Error al localizar Objeto Remoto");
+        //     e.printStackTrace();
+        // }
         
         BombermanCliente cliente = new BombermanCliente();
-        cliente.asociarStub(Stub);
-        
+        // cliente.asociarStub(Stub);
+        cliente.localizarObjetoRemoto("Bomberman", host); 
         System.out.println("Número de jugadores (Entre 2 y 4): ");
         int N = sc.nextInt();
         if (cliente.buscarPartida(N)){
